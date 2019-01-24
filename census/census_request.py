@@ -3,7 +3,7 @@ import os
 import pickle
 import urllib.request
 
-class RequestManager:
+class CensusRequestManager:
     def __init__(self, url=None):
         self.requests = {}
         if url is not None:
@@ -26,7 +26,7 @@ class RequestManager:
             strings[key] = self.request[key].parse()
         return strings
 
-class Request:
+class CensusRequest:
     def __init__(self, url):
         self.url = url
         self.ext = self.get_ext(url)
