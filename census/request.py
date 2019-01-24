@@ -3,6 +3,27 @@ import pickle
 import urllib.request
 import os
 
+class RequestManager:
+    def __init__(self):
+        self.requests = {}
+
+    def new(self, url):
+        if type(url is list):
+            for u in url:
+                self.requests[u] = Request[u]
+        else:
+            self.requests[url] = Request(url)
+
+    def request_all(self):
+        for key in self.requests:
+            self.requests[key].request()
+
+    def parse_all(self):
+        strings = {}
+        for key in self.requests:
+            strings[key] = self.request[key].parse()
+        return strings
+
 
 class Request:
     def __init__(self, url):
@@ -12,10 +33,8 @@ class Request:
 
     # Public API
     def parse(self):
-        if self.ext == '.json':
-            return self.parse_json(self.response)
-        elif self.ext == '.xml':
-            return self.parse_xml(self.response)
+        response = self.response.decode('utf8')
+        return response
             
     def request(self):
         response = urllib.request.urlopen(self.url)
@@ -28,13 +47,15 @@ class Request:
         if ext in exts:
             return ext
         raise ValueError(ext + ' is not a support extensions.')
-
+    """
     def parse_json(self, response):
-        decoded = response.decode('utf8')
-        return json.loads(decoded)
+        json_string = json.loads(response)
+        return json_string
 
     def parse_xml(self, response):
+        xml_string = 0
         return json.loads(response)
+    """
 
 
 if __name__ == '__main__':
@@ -43,5 +64,5 @@ if __name__ == '__main__':
 
     req = Request(jurl)
     req.request()
-    json = req.parse()
-    print(json)
+    xml = req.parse()
+    print(xml)
