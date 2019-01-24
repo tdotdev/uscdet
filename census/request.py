@@ -1,16 +1,18 @@
 import json
+import os
 import pickle
 import urllib.request
-import os
 
 class RequestManager:
-    def __init__(self):
+    def __init__(self, url=None):
         self.requests = {}
+        if url is not None:
+            self.new(url)
 
-    def new(self, url):
+    def add(self, url):
         if type(url is list):
             for u in url:
-                self.requests[u] = Request[u]
+                self.requests[u] = Request(u)
         else:
             self.requests[url] = Request(url)
 
@@ -23,7 +25,6 @@ class RequestManager:
         for key in self.requests:
             strings[key] = self.request[key].parse()
         return strings
-
 
 class Request:
     def __init__(self, url):
@@ -47,22 +48,6 @@ class Request:
         if ext in exts:
             return ext
         raise ValueError(ext + ' is not a support extensions.')
-    """
-    def parse_json(self, response):
-        json_string = json.loads(response)
-        return json_string
-
-    def parse_xml(self, response):
-        xml_string = 0
-        return json.loads(response)
-    """
-
 
 if __name__ == '__main__':
-    jurl = r"https://api.census.gov/data.json"
-    xurl = r"https://api.census.gov/data.xml"
-
-    req = Request(jurl)
-    req.request()
-    xml = req.parse()
-    print(xml)
+    print('request.py')
