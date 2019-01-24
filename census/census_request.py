@@ -7,14 +7,14 @@ class CensusRequestManager:
     def __init__(self, url=None):
         self.requests = {}
         if url is not None:
-            self.new(url)
+            self.add(url)
 
     def add(self, url):
         if type(url is list):
             for u in url:
-                self.requests[u] = Request(u)
+                self.requests[u] = CensusRequest(u)
         else:
-            self.requests[url] = Request(url)
+            self.requests[url] = CensusRequest(url)
 
     def request_all(self):
         for key in self.requests:
@@ -23,7 +23,7 @@ class CensusRequestManager:
     def parse_all(self):
         strings = {}
         for key in self.requests:
-            strings[key] = self.request[key].parse()
+            strings[key] = self.requests[key].parse()
         return strings
 
 class CensusRequest:
@@ -50,4 +50,4 @@ class CensusRequest:
         raise ValueError(ext + ' is not a support extensions.')
 
 if __name__ == '__main__':
-    print('request.py')
+    print(r"You shouldn't be executing this directly ;-)")
