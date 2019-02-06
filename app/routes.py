@@ -10,11 +10,11 @@ def index():
 def geo():
     return 'Geographic data endpoint'
 
-@app.route('/chart')
+@app.route('/plot')
 def chart():
-    return 'Chart data endpoint.'
+    return 'Plotted data endpoint.'
 
-@app.route('/tabular')
+@app.route('/tab')
 def tabular():
     return 'Tabular data endpoint.'
 
