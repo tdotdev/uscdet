@@ -5,7 +5,7 @@ DATA_DISCOVERY_MAP = {
     'json': r"https://api.census.gov/data.json"
 }
 
-data_dir = os.path.join(os.getcwd(), r"data")
+data_dir = os.path.join(os.getcwd(), r"census/data")
 print(f"Writing Data Discover files to {data_dir}")
 
 requests = CensusRequestManager(

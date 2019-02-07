@@ -8,16 +8,16 @@ def index():
 
 @app.route('/geo')
 def geo():
-    return 'Geographic data endpoint'
+    return render_template('geo.html')
+    
+@app.route('/novel')
+def novel():
+    return render_template('novel.html')
 
 @app.route('/plot')
 def chart():
-    return 'Plotted data endpoint.'
+    return render_template('plot.html')
 
 @app.route('/tab')
 def tabular():
-    return 'Tabular data endpoint.'
-
-@app.route('/novel')
-def novel():
-    return 'Novel data endpoint.'
+    return render_template('tab.html')
