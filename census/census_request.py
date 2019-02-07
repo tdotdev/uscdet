@@ -10,11 +10,7 @@ class CensusRequestManager:
             self.add(url)
 
     def add(self, url):
-        if type(url is list):
-            for u in url:
-                self.requests[u] = CensusRequest(u)
-        else:
-            self.requests[url] = CensusRequest(url)
+        self.requests[url] = CensusRequest(url)
 
     def request_all(self):
         for key in self.requests:
@@ -29,7 +25,6 @@ class CensusRequestManager:
 class CensusRequest:
     def __init__(self, url):
         self.url = url
-        self.ext = self.get_ext(url)
         self.response = None
 
     # Public API
@@ -42,9 +37,9 @@ class CensusRequest:
         self.response = response.read()
 
     # Private API   
-    def get_ext(self, url):
+    def get_ext(self):
         exts = ('.xml', '.json')
-        ext = os.path.splitext(url)[1]
+        ext = os.path.splitext(self.url)[1]
         if ext in exts:
             return ext
         raise ValueError(ext + ' is not a support extensions.')
