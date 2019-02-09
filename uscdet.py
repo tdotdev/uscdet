@@ -1,4 +1,5 @@
 from app import app
+from census.census import pop_density, pop_density2
 
 from bokeh.embed import server_document
 from bokeh.server.server import Server
@@ -16,11 +17,12 @@ def status():
 
 def bokeh_server_worker():
     bk_server = Server(
-        {},
+        {'/pop_density': pop_density,
+        '/pop_density2': pop_density2},
         io_loop=IOLoop(),
         allow_websocket_origin=[
-            get_url(FLASK_PORT),
-            get_url(BOKEH_PORT)
+            'localhost:5000',
+            'localhost:5006'
         ]
     )
     bk_server.start()
@@ -28,4 +30,4 @@ def bokeh_server_worker():
 
 if __name__ == '__main__':
     threading.Thread(target=bokeh_server_worker).start()
-    app.run()
+    app.run(debug=True)

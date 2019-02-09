@@ -1,4 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% block javascript %}
+    {{script | safe}}
+{% endblock %}
 {% endblock %}

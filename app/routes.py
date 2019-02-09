@@ -1,5 +1,6 @@
 from app import app
 from flask import render_template
+from bokeh.embed import server_document
 
 @app.route('/')
 @app.route('/index')
@@ -8,11 +9,13 @@ def index():
 
 @app.route('/geo')
 def geo():
-    return render_template('geo.html')
+    script = server_document('http://localhost:5006/pop_density')
+    return render_template('geo.html', script=script)
     
 @app.route('/novel')
 def novel():
-    return render_template('novel.html')
+    script = server_document('http://localhost:5006/pop_density2')
+    return render_template('geo.html', script=script)
 
 @app.route('/plot')
 def chart():
