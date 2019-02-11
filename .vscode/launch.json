@@ -4,11 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "Python: Current File (Integrated Terminal)",
             "type": "python",
             "request": "launch",
             "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "USC-DET",
+            "pythonPath": "C:\\Users\\Timmy Snyder\\src\\venv\\Scripts\\python.exe",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/uscdet.py",
             "console": "integratedTerminal"
         },
         {
