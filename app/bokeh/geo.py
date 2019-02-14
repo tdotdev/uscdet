@@ -2,7 +2,9 @@ from bokeh.sampledata import us_states
 from census.dicts import stname_from_code
 
 from bokeh.io import show
-from bokeh.models import LogColorMapper, LinearColorMapper
+from bokeh.layouts import column, widgetbox
+from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper
+from bokeh.models.widgets import Select
 from bokeh.palettes import Viridis11 as palette
 from bokeh.plotting import figure
 
@@ -42,16 +44,71 @@ def get_census_data(url, key, vals):
 
     return parsed_map
 
-def geo_plot(url, key, vals):
+def geo_plot(doc):
+    from census.key import API_KEY
+    url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key=" + API_KEY
+    key='STNAME' 
+    val_keys=['POP', 'BIRTHS', 'DEATHS']
+
     IGNORE = ['Puerto Rico Commonwealth', 'District of Columbia']
 
     geo_data = get_geo_data()
-    census_data = get_census_data(url, key=key, vals=vals)
+    census_data = get_census_data(url, key=key, vals=val_keys)
 
     for region in IGNORE:
         census_data.pop(region, None)
 
+    geo_xs = []
+    geo_ys =[]
+    vals = []
+    names = list(census_data.keys())
+    val_key = val_keys[0]
+    
+    for state in census_data:
+        geo_xs.append(geo_data[state]['lons'])
+        geo_ys.append(geo_data[state]['lats'])
+        vals.append(int(census_data[state][val_key]))
 
-from census.key import API_KEY
-url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key=" + API_KEY
-geo_plot(url, key='STNAME', vals=['POP', 'BIRTHS', 'DEATHS'])
+    data = ColumnDataSource(dict(
+        x=geo_xs,
+        y=geo_ys,
+        names=names,
+        rate=vals
+    ))
+
+    p = figure(
+        title="Geographic Visualizer",
+        x_range=(-130,-60),
+        y_range=(23, 52),
+        plot_width=1200,
+        plot_height=675
+    )
+
+    p.grid.grid_line_color = None
+    palette.reverse()
+    color_mapper = LinearColorMapper(palette=palette)
+    p.patches(
+        'x', 'y', source=data,
+        fill_color={'field':'rate', 'transform': color_mapper},
+        fill_alpha=.7, line_color="white", line_width=0.5)
+
+    def dataset_select_callback(value, old, new):
+        val_key = new
+        vals = []
+        for state in census_data:
+            vals.append(int(census_data[state][val_key]))
+        new_data = dict(
+            x=geo_xs,
+            y=geo_ys,
+            names=names,
+            rate=vals
+        )
+        data.data = new_data
+
+    dataset_select = Select(title='Dataset', value=val_key, options=val_keys)
+    dataset_select.on_change('value', dataset_select_callback)
+
+    doc.add_root(column(p, dataset_select))
+
+if __name__ == '__main__':
+    pass

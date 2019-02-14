@@ -9,7 +9,7 @@ def index():
 
 @app.route('/geo')
 def geo():
-    script = server_document('http://localhost:5006/pop_density')
+    script = server_document('http://localhost:5006/geo')
     return render_template('geo.html', script=script)
     
 @app.route('/novel')
