@@ -46,16 +46,12 @@ def geo_plot(url, key, vals):
     IGNORE = ['Puerto Rico Commonwealth', 'District of Columbia']
 
     geo_data = get_geo_data()
-    census_data = get_census_data(url, key='STNAME', vals=['POP', 'DATE'])
+    census_data = get_census_data(url, key=key, vals=vals)
 
-    for ign in IGNORE:
-        census_data.pop(ign, None)
+    for region in IGNORE:
+        census_data.pop(region, None)
 
-    for i,w in zip(geo_data, census_data):
-        if i != w:
-            print(i, w)
-    
 
 from census.key import API_KEY
-url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP&DATE=7&for=STATE:*&key=" + API_KEY
-geo_plot(url, key='STNAME', vals=['POP', 'DATE'])
+url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key=" + API_KEY
+geo_plot(url, key='STNAME', vals=['POP', 'BIRTHS', 'DEATHS'])
