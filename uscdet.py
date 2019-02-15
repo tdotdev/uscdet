@@ -1,6 +1,5 @@
 from app import app
 from app.bokeh.geo import geo_plot
-from census.census import pop_density2
 
 from bokeh.embed import server_document
 from bokeh.server.server import Server
@@ -18,8 +17,7 @@ def status():
 
 def bokeh_server_worker():
     bk_server = Server(
-        {'/geo': geo_plot,
-        '/novel': pop_density2},
+        {'/geo': geo_plot},
         io_loop=IOLoop(),
         allow_websocket_origin=[
             'localhost:5000',

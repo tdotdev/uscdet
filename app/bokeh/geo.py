@@ -5,7 +5,7 @@ from bokeh.io import show
 from bokeh.layouts import column, widgetbox
 from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper
 from bokeh.models.widgets import Select
-from bokeh.palettes import Viridis11 as palette
+from bokeh.palettes import Viridis11
 from bokeh.plotting import figure
 
 def get_geo_data():
@@ -24,6 +24,7 @@ def get_census_data(url, key, vals):
     my_requests = CensusRequestManager(url)
     my_requests.request_all()
     payload = my_requests.parse_all()[url]
+    payload = payload.replace('null', 'None')
     parsed = eval(payload)
 
     data_var_key = parsed[0]
@@ -46,9 +47,15 @@ def get_census_data(url, key, vals):
 
 def geo_plot(doc):
     from census.key import API_KEY
+    
     url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key=" + API_KEY
     key='STNAME' 
     val_keys=['POP', 'BIRTHS', 'DEATHS']
+    """
+    url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,DENSITY,DOM,NIM&DATE=7&for=STATE:*&key=" + API_KEY
+    key='STNAME' 
+    val_keys=['DENSITY', 'DOM', 'NIM']
+    """
 
     IGNORE = ['Puerto Rico Commonwealth', 'District of Columbia']
 
@@ -61,49 +68,53 @@ def geo_plot(doc):
     geo_xs = []
     geo_ys =[]
     vals = []
-    names = list(census_data.keys())
+    states = list(census_data.keys())
     val_key = val_keys[0]
     
     for state in census_data:
         geo_xs.append(geo_data[state]['lons'])
         geo_ys.append(geo_data[state]['lats'])
-        vals.append(int(census_data[state][val_key]))
+        vals.append(float(census_data[state][val_key]))
 
     data = ColumnDataSource(dict(
         x=geo_xs,
         y=geo_ys,
-        names=names,
-        rate=vals
+        state=states,
+        val=vals
     ))
 
     p = figure(
-        title="Geographic Visualizer",
+        title=val_key,
         x_range=(-130,-60),
         y_range=(23, 52),
         plot_width=1200,
-        plot_height=675
+        plot_height=675,
+        tooltips=[
+            ("State", "@state"), (f"Value", "@val")
+        ]
     )
 
     p.grid.grid_line_color = None
-    palette.reverse()
-    color_mapper = LinearColorMapper(palette=palette)
+    Viridis11.reverse()
+    color_mapper = LinearColorMapper(palette=Viridis11)
     p.patches(
         'x', 'y', source=data,
-        fill_color={'field':'rate', 'transform': color_mapper},
+        fill_color={'field':'val', 'transform': color_mapper},
         fill_alpha=.7, line_color="white", line_width=0.5)
 
     def dataset_select_callback(value, old, new):
         val_key = new
         vals = []
         for state in census_data:
-            vals.append(int(census_data[state][val_key]))
+            vals.append(float(census_data[state][val_key]))
         new_data = dict(
             x=geo_xs,
             y=geo_ys,
-            names=names,
-            rate=vals
+            state=states,
+            val=vals
         )
         data.data = new_data
+        p.title.text=val_key
 
     dataset_select = Select(title='Dataset', value=val_key, options=val_keys)
     dataset_select.on_change('value', dataset_select_callback)

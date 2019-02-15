@@ -1,5 +1,3 @@
-
-
 __CODE_TO_STNAME = {
     'AK':'Alaska', 'AL':'Alabama', 'AR':'Arkansas', 'AZ':'Arizona','CA':'California', 
     'CO':'Colorado', 'CT':'Connecticut', 'DE':'Delaware', 'FL':'Florida', 'GA':'Georgia', 
@@ -19,13 +17,30 @@ def __make_code_to_stname(code_to_stname):
         stname_to_code[code_to_stname[code]] = code
     return stname_to_code
 
+def __make_fips_to_stname(code_to_stname):
+    fips_to_stname = {}
+    for i, (code) in enumerate(code_to_stname):
+        stname = code_to_stname[code]
+        fips_code = i + 1
+        if fips_code < 10:
+            fips_code = f"0{fips_code}"
+        else:
+            fips_code = f"{fips_code}"
+        fips_to_stname[fips_code] = stname
+    return fips_to_stname
+
 __STNAME_TO_CODE = __make_code_to_stname(__CODE_TO_STNAME)
+__FIPS_TO_STNAME = __make_fips_to_stname(__CODE_TO_STNAME)
 
 def stname_from_code(code):
     code = code.upper()
     return __CODE_TO_STNAME.get(code)
 
+def stname_from_fips(fips_code):
+    return __FIPS_TO_STNAME.get(fips_code)
+
 def code_from_stname(stname):
     return __STNAME_TO_CODE.get(stname)
 
-
+if __name__ == '__main__':
+    print(stname_from_fips('49'))

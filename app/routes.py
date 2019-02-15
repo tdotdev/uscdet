@@ -14,8 +14,7 @@ def geo():
     
 @app.route('/novel')
 def novel():
-    script = server_document('http://localhost:5006/pop_density2')
-    return render_template('geo.html', script=script)
+    return render_template('novel')
 
 @app.route('/plot')
 def chart():
