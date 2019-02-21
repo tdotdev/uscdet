@@ -3,6 +3,8 @@ import os
 import pickle
 import urllib.request
 
+from census.key import API_KEY
+
 class CensusRequestManager:
     def __init__(self, url=None):
         self.requests = {}
@@ -16,10 +18,15 @@ class CensusRequestManager:
         for key in self.requests:
             self.requests[key].request()
 
+    def clear_all(self):
+        self.requests.clear()
+
+
     def parse_all(self):
         strings = {}
         for key in self.requests:
             strings[key] = self.requests[key].parse()
+        
         return strings
 
 class CensusRequest:

@@ -48,7 +48,7 @@ def get_census_data(url, key, vals):
 def geo_plot(doc):
     from census.key import API_KEY
     
-    url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key=" + API_KEY
+    url = f"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key={API_KEY}"
     key='STNAME' 
     val_keys=['POP', 'BIRTHS', 'DEATHS']
     """
