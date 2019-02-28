@@ -1,4 +1,4 @@
-__CODE_TO_STNAME = {
+CODE_TO_STNAME = {
     'AL':'Alabama', 'AK':'Alaska', 'AZ':'Arizona', 'AR':'Arkansas', 'CA':'California', 
     'CO':'Colorado', 'CT':'Connecticut', 'DE':'Delaware', 'FL':'Florida', 'GA':'Georgia', 
     'HI':'Hawaii', 'ID':'Idaho', 'IL':'Illinois', 'IN':'Indiana', 'IA':'Iowa', 
@@ -37,19 +37,19 @@ def __make_fips_to_stname(code_to_stname):
 
     return fips_to_stname
 
-__STNAME_TO_CODE = __make_code_to_stname(__CODE_TO_STNAME)
-__FIPS_TO_STNAME = __make_fips_to_stname(__CODE_TO_STNAME)
+STNAME_TO_CODE = __make_code_to_stname(CODE_TO_STNAME)
+FIPS_TO_STNAME = __make_fips_to_stname(CODE_TO_STNAME)
 
 def stname_from_code(code):
     code = code.upper()
-    return __CODE_TO_STNAME.get(code)
+    return CODE_TO_STNAME.get(code)
 
 def stname_from_fips(fips_code):
-    return __FIPS_TO_STNAME.get(fips_code)
+    return FIPS_TO_STNAME.get(fips_code)
 
 def code_from_stname(stname):
-    return __STNAME_TO_CODE.get(stname)
+    return STNAME_TO_CODE.get(stname)
 
 if __name__ == '__main__':
-    for k in __FIPS_TO_STNAME:
-        print(__FIPS_TO_STNAME[k], k)
+    for k in FIPS_TO_STNAME:
+        print(FIPS_TO_STNAME[k], k)

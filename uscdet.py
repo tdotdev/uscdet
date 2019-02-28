@@ -1,5 +1,6 @@
 from app import app
 from app.bokeh.geo import geo_plot
+from app.bokeh.ts_geo import ts_geo_plot
 
 from bokeh.embed import server_document
 from bokeh.server.server import Server
@@ -17,7 +18,8 @@ def status():
 
 def bokeh_server_worker():
     bk_server = Server(
-        {'/geo': geo_plot},
+        {'/geo': geo_plot,
+        '/ts_geo': ts_geo_plot},
         io_loop=IOLoop(),
         allow_websocket_origin=[
             'localhost:5000',

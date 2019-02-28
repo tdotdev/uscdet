@@ -11,6 +11,11 @@ def index():
 def geo():
     script = server_document('http://localhost:5006/geo')
     return render_template('geo.html', script=script)
+
+@app.route('/ts_geo')
+def ts_geo():
+    script = server_document('http://localhost:5006/ts_geo')
+    return render_template('geo.html', script=script)
     
 @app.route('/novel')
 def novel():

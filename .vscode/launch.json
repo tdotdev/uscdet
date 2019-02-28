@@ -68,6 +68,15 @@
             "request": "launch",
             "program": "${file}",
             "console": "externalTerminal"
+        },
+        
+        {
+            "name": "modmodmod",
+            "type": "python",
+            "request": "launch",
+            "pythonPath": "C:\\Users\\Timmy Snyder\\src\\venv\\Scripts\\python.exe",
+            "module": "app.test",
         }
+    ]
     ]
 }

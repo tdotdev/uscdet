@@ -41,12 +41,13 @@ class CensusDataInterface:
         for key in self.opt_vars: 
             print(key)
 
-    def build_url_query(self, var_params, req_params):
-        url = f"https://api.census.gov/data/{self.year}/"
-        for param in self.dataset_params:
-            url = os.path.join(url, param)
 
-        url = url[:len(url)] + '?get='
+    def build_url_query(self, var_params, req_params):
+        url = f"https://api.census.gov/data/{self.year}"
+        for param in self.dataset_params:
+            url = url + '/' + param
+
+        url = f"{url}?get="
 
         for param in var_params:
             url += f"{param},"
@@ -61,7 +62,7 @@ class CensusDataInterface:
         return url
 
 
-
+"""
 for switch in range(3):
         
     if switch == 0:
@@ -80,3 +81,4 @@ for switch in range(3):
     api = CensusDataInterface(dset_params)
     z = api.build_url_query(var_params, req_params)
     print(z)
+"""
