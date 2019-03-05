@@ -1,15 +1,20 @@
 <!doctype html>
 <html>
     <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}">
     </head>
     <body>
         <div id="navbar">
             <a href="/index">Home</a>
+            <a href="/query">Query</a>
             <a href="/geo">Geographic</a>
             <a href="/plot">Plotted</a>
             <a href="/tab">Tabular</a>
             <a href="/novel">Novel</a>
         </div>
+        
+        <button type="button" class="btn btn-primary">Primary</button>
         {% block content %}{% endblock %}
     </body>
 </html>

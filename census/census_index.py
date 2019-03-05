@@ -16,8 +16,6 @@ for dset in data_json['dataset']:
     if d_type == 'timeseries':
         sets = sets[1::]
 
-
-
     entry = c_index.get(d_type, None)
 
     if entry is None:

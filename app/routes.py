@@ -7,6 +7,10 @@ from bokeh.embed import server_document
 def index():
     return render_template('index.html')
 
+@app.route('/query')
+def query():
+    return render_template('query.html')
+
 @app.route('/geo')
 def geo():
     script = server_document('http://localhost:5006/geo')
