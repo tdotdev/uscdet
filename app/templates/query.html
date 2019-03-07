@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>Hello!</p>
-<button type="button" class="btn btn-primary">Primary</button>
+<script src="{{url_for('static', filename='js/query.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static', filename='css/query.css')}}">
+
+<div>
+    <div id="tree"></div>
+</div>
 {% endblock %}

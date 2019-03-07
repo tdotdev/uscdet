@@ -1,20 +1,29 @@
 <!doctype html>
 <html>
     <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}">
+        <script src="{{url_for('static', filename='js/jquery-3.3.1.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/bootstrap3.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/bootstrap-treeview.min.js')}}"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap3.min.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap-treeview.min.css')}}">
+        <!--script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script-->
     </head>
+
     <body>
-        <div id="navbar">
-            <a href="/index">Home</a>
-            <a href="/query">Query</a>
-            <a href="/geo">Geographic</a>
-            <a href="/plot">Plotted</a>
-            <a href="/tab">Tabular</a>
-            <a href="/novel">Novel</a>
-        </div>
-        
-        <button type="button" class="btn btn-primary">Primary</button>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/index">US Census Explorer</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><a href="/index">Home</a></li>
+                    <li><a href="/query">Datasets</a></li>
+                    <li><a href="/geo">Geographic</a></li>
+                    <li><a href="/ts_geo">Time Series</a></li>
+                     <li><a href="/plot">Plotted</a></li>
+                </ul>
+            </div>
+        </nav>
         {% block content %}{% endblock %}
     </body>
 </html>

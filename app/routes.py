@@ -1,6 +1,8 @@
 from app import app
-from flask import render_template
+from flask import render_template, url_for
 from bokeh.embed import server_document
+from census.census_index import census_index_json
+
 
 @app.route('/')
 @app.route('/index')
@@ -15,6 +17,10 @@ def query():
 def geo():
     script = server_document('http://localhost:5006/geo')
     return render_template('geo.html', script=script)
+
+@app.route('/index_json')
+def index_json():
+    return census_index_json()
 
 @app.route('/ts_geo')
 def ts_geo():

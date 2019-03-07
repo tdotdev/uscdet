@@ -7,10 +7,12 @@ from bokeh.server.server import Server
 import threading
 from tornado.ioloop import IOLoop
 
-app.config['STATIC_FOLDER'] = './app/static'
 
 FLASK_PORT = '5000'
 BOKEH_PORT = '5006'
+
+app.static_url_path = '/app/static'
+print(app.static_url_path)
 
 def get_url(port):
     return f"localhost:{port}" 

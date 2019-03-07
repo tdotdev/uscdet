@@ -34,4 +34,28 @@ for dset in data_json['dataset']:
             else:
                 cursor = cursor[key]
 
-print(c_index)
+def entry_to_json(entry, key):
+    nodes = []
+    
+    for new_key in entry[key]:
+        if new_key == 'desc' or new_key == 'title':
+            nodes.append({'text': entry[key][new_key]})
+        else:
+            nodes.append(entry_to_json(entry[key], new_key))
+
+    return {'nodes': nodes, 'text': key}
+
+def census_index_json():
+    treeview = {
+        'text': 'Datasets', 
+        'nodes': []
+    }
+    
+    for key in c_index:
+        treeview['nodes'].append(entry_to_json(c_index, key))
+
+    ts = [treeview['nodes'][0]]
+    nodes = treeview['nodes'][1::]
+    treeview['nodes'] = ts + sorted(nodes, key=lambda d: int(d['text']))
+
+    return json.dumps(treeview)
