@@ -27,7 +27,6 @@ $(document).ready(function () {
         });
     }
 
-    
     $("#data-select").submit(function(){
         $.ajax({
             type: 'POST',
@@ -38,4 +37,5 @@ $(document).ready(function () {
             }
         })
     });
+    
 });

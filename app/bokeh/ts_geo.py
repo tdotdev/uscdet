@@ -1,4 +1,5 @@
 import json
+import time
 
 from census.census_data_interface import CensusDataInterface
 from census.census_request import CensusRequestManager
@@ -8,7 +9,7 @@ from census.dicts import *
 from bokeh.io import show
 from bokeh.layouts import column, widgetbox
 from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper
-from bokeh.models.widgets import Slider
+from bokeh.models.widgets import Slider, Button
 from bokeh.palettes import Viridis256
 from bokeh.plotting import figure
 from bokeh.sampledata import us_states
@@ -65,8 +66,10 @@ def ts_geo_plot(doc):
         val=vals
     ))
 
+    p_title = "Population by Age"
+
     p = figure(
-        title='Population by Age',
+        title=p_title,
         x_range=(-130,-60),
         y_range=(23, 52),
         plot_width=1200,
@@ -75,6 +78,7 @@ def ts_geo_plot(doc):
             ("State", "@state"), (f"Value", "@val")
         ]
     )
+
 
     p.grid.grid_line_color = None
     Viridis256.reverse()
@@ -97,9 +101,18 @@ def ts_geo_plot(doc):
             val=vals
         )
         data.data = new_data
-        p.title.text=val_key
+        p.title.text=f"{p_title}: {val_key}"
+
+    def play_button_callback():
+        start = time_slider.value
+        for i in range(start, max(times)):
+            time_slider.value += 1
+            time.sleep(.05)
 
     time_slider = Slider(start=min(times), end=max(times), value=min(times), step=1, title='Age')
     time_slider.on_change('value', time_slider_callback)
 
-    doc.add_root(column(p, time_slider))
+    play_button = Button(label='Play')
+    play_button.on_click(play_button_callback)
+
+    doc.add_root(column(p, time_slider, play_button))
