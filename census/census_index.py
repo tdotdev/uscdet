@@ -36,19 +36,31 @@ for dset in data_json['dataset']:
 
 def entry_to_json(entry, key):
     nodes = []
-    
+    IGNORE = ['selectable', 'tags', 'icon', 'backColor']
     for new_key in entry[key]:
-        if new_key == 'desc' or new_key == 'title':
-            nodes.append({'text': entry[key][new_key]})
+        if new_key in IGNORE:
+            continue
+        if new_key == 'title':
+            nodes.append({'text': f"{entry[key][new_key]}", 'backColor': '#d1ffe9'})
+        elif new_key == 'desc':
+            nodes.append({
+                'text': 'Description', 
+                'selectable': False, 
+                'nodes': [{
+                    'text': entry[key][new_key],
+                    'selectable': False
+                }]
+            })
         else:
             nodes.append(entry_to_json(entry[key], new_key))
 
-    return {'nodes': nodes, 'text': key}
+    return {'nodes': nodes, 'text': key, 'selectable': False}
 
 def census_index_json():
     treeview = {
         'text': 'Datasets', 
-        'nodes': []
+        'nodes': [],
+        'selectable': False
     }
     
     for key in c_index:

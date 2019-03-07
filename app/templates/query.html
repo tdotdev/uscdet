@@ -4,7 +4,12 @@
 <script src="{{url_for('static', filename='js/query.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static', filename='css/query.css')}}">
 
-<div>
-    <div id="tree"></div>
+<div class="container">
+    <form id="data-select" action="">
+    <div class="form-group">
+        <div id="tree"></div>
+    </div>
+    <input type="submit" value="Submit" class="btn btn-default">
+    </form>
 </div>
 {% endblock %}
