@@ -13,28 +13,36 @@ def index():
 def query():
     return render_template('query.html')
 
+
 @app.route('/geo', methods=['GET'])
 def geo():
-    script = server_document('http://localhost:5006/geo')
+    args = request.args.getlist('p')
+    script = server_document('http://localhost:5006/geo', arguments={'args': args})
     return render_template('geo.html', script=script)
+
+@app.route('/ts_geo', methods=['GET'])
+def ts_geo():
+    script = server_document('http://localhost:5006/ts_geo')
+    return render_template('geo.html', script=script)
+
+
+@app.route('/plot', methods=['GET'])
+def plot():
+    return render_template('plot.html')
+
+@app.route('/ts_plot', methods=['GET'])
+def ts_plot():
+    return render_template('plot.html')
+
 
 @app.route('/index_json')
 def index_json():
     return census_index_json()
-
-@app.route('/ts_geo')
-def ts_geo():
-    script = server_document('http://localhost:5006/ts_geo')
-    return render_template('geo.html', script=script)
     
+
 @app.route('/novel')
 def novel():
     return render_template('novel')
-
-@app.route('/plot')
-def chart():
-    return render_template('plot.html')
-
 @app.route('/tab')
 def tabular():
     return render_template('tab.html')

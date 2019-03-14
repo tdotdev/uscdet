@@ -14,6 +14,7 @@ from bokeh.palettes import Viridis256
 from bokeh.plotting import figure
 from bokeh.sampledata import us_states
 
+"""
 api = CensusDataInterface(['pep', 'stchar6'])
 geo_data = get_geo_data()
 var_params = ['AGE', 'SEX', 'STNAME', 'HISP', 'POP', 'RACE6']
@@ -44,7 +45,7 @@ for entry in census_data:
             time_series[key][state] += pop
         else:
             time_series[key][state] = pop
-
+"""
 def ts_geo_plot(doc):
     
     times = [time for time in time_series]

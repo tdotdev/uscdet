@@ -1,6 +1,7 @@
 from bokeh.sampledata import us_states
-from census.dicts import stname_from_code
+from census.dicts import FIPS_TO_STNAME, stname_from_code
 from census.census_index import c_index
+from census.census_data_interface import CensusDataInterface
 from app import app
 
 from bokeh.io import show
@@ -52,48 +53,48 @@ def get_census_data(url, key, vals):
 def geo_plot(doc):
     from census.key import API_KEY
 
-    with app.test_request_context():
-        args = request.args.getlist('p')
-        print(args)
-    
-    
-    url = f"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key={API_KEY}"
-    key='STNAME' 
-    val_keys=['POP', 'BIRTHS', 'DEATHS']
-    """
-    url = r"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,DENSITY,DOM,NIM&DATE=7&for=STATE:*&key=" + API_KEY
-    key='STNAME' 
-    val_keys=['DENSITY', 'DOM', 'NIM']
-    """
+    try:
+        args = doc.session_context.request.arguments['args'][0].decode(encoding='UTF-8')
+    except:
+        args = []
 
-    IGNORE = ['Puerto Rico Commonwealth', 'District of Columbia']
+    args = eval(args)
 
+    cdi = CensusDataInterface(args)
+    census_data = cdi.execute_query()
     geo_data = get_geo_data()
-    census_data = get_census_data(url, key=key, vals=val_keys)
-
-    for region in IGNORE:
-        census_data.pop(region, None)
 
     geo_xs = []
     geo_ys =[]
     vals = []
     states = list(census_data.keys())
-    val_key = val_keys[0]
+
+    list_vars= cdi.get_list_vars()
+    list_vars_labels = cdi.get_list_vars_key('label')
+    val_keys = {}
+    for var, label in zip(list_vars, list_vars_labels):
+        val_keys[label] = var
+
+    val_key = list_vars[0]
     
-    for state in census_data:
+    for fips in census_data:
+        state = FIPS_TO_STNAME[fips]
         geo_xs.append(geo_data[state]['lons'])
         geo_ys.append(geo_data[state]['lats'])
-        vals.append(float(census_data[state][val_key]))
+        try:
+            vals.append(float(census_data[fips][val_key]['val']))
+        except:
+            vals.append(census_data[fips][val_key]['val'])
 
     data = ColumnDataSource(dict(
         x=geo_xs,
         y=geo_ys,
-        state=states,
+        state=[FIPS_TO_STNAME[fips] for fips in states],
         val=vals
     ))
 
     p = figure(
-        title=val_key,
+        title=list_vars_labels[0],
         x_range=(-130,-60),
         y_range=(23, 52),
         plot_width=1200,
@@ -112,20 +113,25 @@ def geo_plot(doc):
         fill_alpha=.7, line_color="white", line_width=0.5)
 
     def dataset_select_callback(value, old, new):
-        val_key = new
+        val_key = val_keys[new]
         vals = []
-        for state in census_data:
-            vals.append(float(census_data[state][val_key]))
+        
+        for fips in census_data:
+            try:
+                vals.append(float(census_data[fips][val_key]['val']))
+            except:
+                vals.append(census_data[fips][val_key]['val'])
+
         new_data = dict(
             x=geo_xs,
             y=geo_ys,
-            state=states,
+            state=[FIPS_TO_STNAME[fips] for fips in states],
             val=vals
         )
         data.data = new_data
-        p.title.text=val_key
+        p.title.text = new
 
-    dataset_select = Select(title='Dataset', value=val_key, options=val_keys)
+    dataset_select = Select(title='Dataset', value=val_key, options=[key for key in val_keys])
     dataset_select.on_change('value', dataset_select_callback)
 
     doc.add_root(column(p, dataset_select))

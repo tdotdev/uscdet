@@ -81,13 +81,20 @@ $(document).ready(function () {
             }
         }
 
+        if(timeSeries) {
+            strippedParams.unshift('timeseries');
+        }
+
         for(var i = 0; i < strippedParams.length; i++) {
             args += 'p=' + strippedParams[i].toString() + '&';
         }
 
         args = args.slice(0, args.length - 1);
 
-        window.location = "http://localhost:5000/" + endpoint + '?' + args;
+        var url = "http://localhost:5000/" + endpoint + '?' + args;
+        console.log(url);
+
+        window.location = url;
     });
     
 });

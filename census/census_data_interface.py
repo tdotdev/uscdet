@@ -3,63 +3,99 @@ import os
 from pathlib import Path
 
 from census.census_request import CensusRequestManager
+from census.census_index import c_index
 from census.key import API_KEY
+from census.dicts import FIPS_TO_STNAME
+
 
 class CensusDataInterface:
-    def __init__(self, dataset_params):
-        self.dataset_params = dataset_params
+    def __init__(self, args):
 
-        with open(r"census/data/data.json", 'r') as df:
-            data_json = json.loads(df.read())
+        self.args = args
 
-        for dset in data_json['dataset']:
-            if dset['c_dataset'] == dataset_params:
-                dataset = dset
-                self.year = dset['c_vintage']
+        cursor = c_index
+        for arg in self.args:
+            cursor = cursor.get(arg, None)
 
-        var_link = dataset['c_variablesLink']
-        crm = CensusRequestManager(var_link)
+        self.title = cursor['title']
+        self.desc = cursor['desc']
+        self.var_link = cursor['vars'] + f"?key={API_KEY}"
+        self.vars = {}
+
+        crm = CensusRequestManager(self.var_link)
         crm.request_all()
 
-        self.opt_vars = {}
-        self.req_vars = {}
-
-        vars_json = json.loads(crm.parse_all()[var_link])
+        vars_json = json.loads(crm.parse_all()[self.var_link])
+        i = 0
         for vid in vars_json['variables']:
             var = vars_json['variables'][vid]
-            label = var['label']
-            req_var = var.get('required', None)
-            if req_var is not None and req_var != 'default displayed':
-                self.req_vars[vid] = var
-            else:
-                self.opt_vars[vid] = var
+            if 'predicateOnly' in var:
+                continue
+            self.vars[vid.lower()] = var
+            i += 1
+            if i == 10:
+                break
     
     def print_vars(self):
-        print('Required')
-        for key in self.req_vars:
-            print(key)
-        for key in self.opt_vars: 
+        print('Vars:')
+        for key in self.vars: 
             print(key)
 
+    def get_list_vars(self):
+        return [key for key in self.vars]
 
-    def build_url_query(self, var_params, req_params):
-        url = f"https://api.census.gov/data/{self.year}"
-        for param in self.dataset_params:
+    def get_list_vars_key(self, meta_key):
+        return [self.vars[key][meta_key] for key in self.vars]
+
+
+
+    def make_url(self):
+        url = f"https://api.census.gov/data"
+        for param in self.args:
             url = url + '/' + param
 
         url = f"{url}?get="
 
-        for param in var_params:
-            url += f"{param},"
+        for key in self.vars:
+            url += f"{key.upper()},"
 
         url = url[:-1]
-
-        for param in req_params:
-            url += f"&{param}={req_params[param]}"
 
         url += f"&for=STATE:*&key={API_KEY}"
 
         return url
+
+    def execute_query(self):
+        url = self.make_url()
+        crm = CensusRequestManager(url)
+        crm.request_all()
+        parsed = crm.parse_all()
+
+        parsed_json = json.loads(parsed[url])
+        header = [key.lower() for key in parsed_json[0]]
+        body = parsed_json[1::]
+
+        header_index = {}
+        for i, (key) in enumerate(header):
+            header_index[key] = i
+
+        dataset = {}
+
+        for entry in body:
+            fips_key = entry[header_index['state']]
+            if FIPS_TO_STNAME.get(fips_key, None) == None:
+                continue
+            dataset[fips_key] = {}
+            for key in header_index:
+                if key == 'state':
+                    continue
+                var = entry[header_index[key]]
+                dataset[fips_key][key] = {}
+                dataset[fips_key][key]['val'] = var
+                dataset[fips_key][key]['meta'] = self.vars[key]
+
+        return dataset
+
 
 
 """
