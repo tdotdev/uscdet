@@ -63,6 +63,7 @@ class CensusDataInterface:
 
         url += f"&for=STATE:*&key={API_KEY}"
 
+        print('URL!!!!', url)
         return url
 
     def execute_query(self):

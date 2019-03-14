@@ -6,7 +6,7 @@ from app import app
 
 from bokeh.io import show
 from bokeh.layouts import column, widgetbox
-from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper
+from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper, ColorBar, BasicTicker
 from bokeh.models.widgets import Select
 from bokeh.palettes import Viridis11
 from bokeh.plotting import figure, curdoc
@@ -105,8 +105,15 @@ def geo_plot(doc):
     )
 
     p.grid.grid_line_color = None
+    p.xaxis.visible = False
+    p.yaxis.visible = False
+    p.title.text_font_size = '18pt'
+
     Viridis11.reverse()
     color_mapper = LinearColorMapper(palette=Viridis11)
+    color_bar = ColorBar(color_mapper=color_mapper, ticker=BasicTicker())
+    p.add_layout(color_bar, 'right')
+
     p.patches(
         'x', 'y', source=data,
         fill_color={'field':'val', 'transform': color_mapper},
