@@ -11,7 +11,7 @@ $(document).ready(function () {
         var response = Http.responseText;
         var c_index = JSON.parse(response);
         c_index = [c_index];
-        console.log(c_index);
+        //console.log(c_index);
         $('#tree').treeview({
             data: c_index,
             onNodeSelected: function(event, node) {
@@ -22,20 +22,72 @@ $(document).ready(function () {
                     node = $('#tree').treeview('getParent', node);
                 }
                 params = params.reverse();
-                console.log(params);
+                //console.log(params);
             }
         });
     }
 
-    $("#data-select").submit(function(){
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            dataType: 'json',
-            success: function(json) {
-               window.location.href = "localhost:5000/geo";
+    var plotType = null;
+
+    $('#plotSelect .btn').on('click', function(event) {
+        plotType = $(this).find('input').val();
+    });
+
+    $("#querySubmit").click(function() {
+        if(params.length == 0) {
+            alert('Please select a dataset.');
+            return;
+        }
+        if(plotType == null) {
+            alert('Please select a plot type');
+            return;
+        }
+
+        var datasetType = params[0];
+        var strippedParams = params.slice(1, params.length)
+        var geographic = false;
+        var timeSeries = false;
+        var endpoint = "";
+        var args = "";
+
+        if(plotType == '0') {
+            geographic = true;
+        }
+        else {
+            geographic = false;
+        }
+
+        if(datasetType == 'Time Series') {
+            timeSeries = true;
+        }
+        else {
+            timeSeries = false;
+        }
+
+        if(timeSeries) {
+            if(geographic) {
+                endpoint = 'ts_geo';
             }
-        })
+            else {
+                endpoint = 'ts_plot';
+            }
+        }
+        else {
+            if(geographic) {
+                endpoint = 'geo';
+            }
+            else {
+                endpoint = 'plot';
+            }
+        }
+
+        for(var i = 0; i < strippedParams.length; i++) {
+            args += 'p=' + strippedParams[i].toString() + '&';
+        }
+
+        args = args.slice(0, args.length - 1);
+
+        window.location = "http://localhost:5000/" + endpoint + '?' + args;
     });
     
 });

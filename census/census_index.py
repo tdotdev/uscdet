@@ -61,7 +61,10 @@ def census_index_json():
     treeview = {
         'text': 'Datasets', 
         'nodes': [],
-        'selectable': False
+        'selectable': False,
+        'state': {
+            'expanded': False
+        }
     }
     
     for key in c_index:
@@ -70,6 +73,11 @@ def census_index_json():
     ts = treeview['nodes'][0]
     ts['text'] = 'Time Series'
     nodes = treeview['nodes'][1::]
-    treeview['nodes'] = [ts] + sorted(nodes, key=lambda d: int(d['text']))
+    non_ts = {
+        'text': 'Non Time Series',
+        'selectable': False,
+        'nodes': sorted(nodes, key=lambda d: int(d['text']))
+    }
+    treeview['nodes'] = [ts] + [non_ts]
 
     return json.dumps(treeview)

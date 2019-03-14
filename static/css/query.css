@@ -1,4 +1,8 @@
 #tree {
-    width: 75vw;
     margin: 0 auto;
+}
+
+#dataSelect {
+    width: 50vw;
+    margin: auto;
 }

@@ -1,12 +1,16 @@
 from bokeh.sampledata import us_states
 from census.dicts import stname_from_code
+from census.census_index import c_index
+from app import app
 
 from bokeh.io import show
 from bokeh.layouts import column, widgetbox
 from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper
 from bokeh.models.widgets import Select
 from bokeh.palettes import Viridis11
-from bokeh.plotting import figure
+from bokeh.plotting import figure, curdoc
+
+from flask import request
 
 def get_geo_data():
     states = us_states.data.copy()
@@ -47,6 +51,11 @@ def get_census_data(url, key, vals):
 
 def geo_plot(doc):
     from census.key import API_KEY
+
+    with app.test_request_context():
+        args = request.args.getlist('p')
+        print(args)
+    
     
     url = f"https://api.census.gov/data/2014/pep/natstprc?get=STNAME,POP,BIRTHS,DEATHS&DATE=7&for=STATE:*&key={API_KEY}"
     key='STNAME' 

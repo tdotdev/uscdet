@@ -1,4 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+<div class="container" id="main">
+    <h1>Welcome to the US Census Explorer</h1>
+    <p>Click datasets to begin building visualizations!</p>
+</div>
 {% endblock %}

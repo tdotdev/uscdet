@@ -5,11 +5,22 @@
 <link rel="stylesheet" href="{{url_for('static', filename='css/query.css')}}">
 
 <div class="container">
-    <form id="data-select" action="">
-    <div class="form-group">
+    <div id="dataSelect">
+        <h1>Select a dataset</h1>
         <div id="tree"></div>
+
+        <div class="btn-group" id="plotSelect" data-toggle="buttons">
+            <label class="btn btn-default">
+                <input type="radio" class="toggle" value="0">Geographic Plot
+            </label>
+
+            <label class="btn btn-default">
+                <input type="radio" class="toggle" value="1">Charted Plot
+            </label>
+        </div>
+
+        <br><br>
+        <button id="querySubmit" type="button" class="btn btn-primary">Submit</button>
     </div>
-    <input type="submit" value="Submit" class="btn btn-default">
-    </form>
 </div>
 {% endblock %}

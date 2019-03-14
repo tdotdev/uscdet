@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, url_for
+from flask import render_template, url_for, request
 from bokeh.embed import server_document
 from census.census_index import census_index_json
 
@@ -13,7 +13,7 @@ def index():
 def query():
     return render_template('query.html')
 
-@app.route('/geo')
+@app.route('/geo', methods=['GET'])
 def geo():
     script = server_document('http://localhost:5006/geo')
     return render_template('geo.html', script=script)
