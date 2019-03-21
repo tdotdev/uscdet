@@ -22,7 +22,8 @@ def geo():
 
 @app.route('/ts_geo', methods=['GET'])
 def ts_geo():
-    script = server_document('http://localhost:5006/ts_geo')
+    args = request.args.getlist('p')
+    script = server_document('http://localhost:5006/ts_geo', arguments={'args': args})
     return render_template('geo.html', script=script)
 
 

@@ -9,9 +9,13 @@ from census.dicts import FIPS_TO_STNAME
 
 
 class CensusDataInterface:
-    def __init__(self, args):
+    def __init__(self, args, limit=False):
 
         self.args = args
+        if args[0] == 'timeseries':
+            self.timeseries = True
+        else:
+            self.timeseries = False
 
         cursor = c_index
         for arg in self.args:
@@ -33,7 +37,7 @@ class CensusDataInterface:
                 continue
             self.vars[vid.lower()] = var
             i += 1
-            if i == 10:
+            if i == 10 and limit == True:
                 break
     
     def print_vars(self):
@@ -63,11 +67,11 @@ class CensusDataInterface:
 
         url += f"&for=STATE:*&key={API_KEY}"
 
-        print('URL!!!!', url)
         return url
 
     def execute_query(self):
         url = self.make_url()
+        print('\n\n', url, '\n\n')
         crm = CensusRequestManager(url)
         crm.request_all()
         parsed = crm.parse_all()
@@ -82,18 +86,45 @@ class CensusDataInterface:
 
         dataset = {}
 
-        for entry in body:
-            fips_key = entry[header_index['state']]
-            if FIPS_TO_STNAME.get(fips_key, None) == None:
-                continue
-            dataset[fips_key] = {}
-            for key in header_index:
-                if key == 'state':
+        if self.timeseries:
+            current_key = ''
+            time_index = 0
+            for entry in body:
+                fips_key = entry[header_index['state']]
+
+                if FIPS_TO_STNAME.get(fips_key, None) == None:
                     continue
-                var = entry[header_index[key]]
-                dataset[fips_key][key] = {}
-                dataset[fips_key][key]['val'] = var
-                dataset[fips_key][key]['meta'] = self.vars[key]
+
+                if fips_key != current_key:
+                    dataset[fips_key] = {}
+                    current_key = fips_key
+                    time_index = 0
+
+                dataset[fips_key][time_index] = {}
+
+                for key in header_index:
+                    if key == 'state':
+                        continue
+                    var = entry[header_index[key]]
+                    dataset[fips_key][time_index][key] = {}
+                    dataset[fips_key][time_index][key]['val'] = var
+                    dataset[fips_key][time_index][key]['meta'] = self.vars[key]
+
+                time_index += 1
+                
+        else:
+            for entry in body:
+                fips_key = entry[header_index['state']]
+                if FIPS_TO_STNAME.get(fips_key, None) == None:
+                    continue
+                dataset[fips_key] = {}
+                for key in header_index:
+                    if key == 'state':
+                        continue
+                    var = entry[header_index[key]]
+                    dataset[fips_key][key] = {}
+                    dataset[fips_key][key]['val'] = var
+                    dataset[fips_key][key]['meta'] = self.vars[key]
 
         return dataset
 

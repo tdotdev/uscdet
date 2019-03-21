@@ -1,18 +1,17 @@
-import json
-import time
-
+from bokeh.sampledata import us_states
+from census.dicts import FIPS_TO_STNAME, stname_from_code
+from census.census_index import c_index
 from census.census_data_interface import CensusDataInterface
-from census.census_request import CensusRequestManager
-from app.bokeh.geo import get_geo_data
-from census.dicts import *
+from app import app
 
 from bokeh.io import show
 from bokeh.layouts import column, widgetbox
-from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper
-from bokeh.models.widgets import Slider, Button
-from bokeh.palettes import Viridis256
-from bokeh.plotting import figure
-from bokeh.sampledata import us_states
+from bokeh.models import ColumnDataSource, LogColorMapper, LinearColorMapper, ColorBar, BasicTicker
+from bokeh.models.widgets import Select, Slider, Button
+from bokeh.palettes import Viridis11
+from bokeh.plotting import figure, curdoc
+
+from flask import request
 
 """
 api = CensusDataInterface(['pep', 'stchar6'])
@@ -46,31 +45,70 @@ for entry in census_data:
         else:
             time_series[key][state] = pop
 """
+
+def get_geo_data():
+    states = us_states.data.copy()
+    state_to_geo = {}
+    for s in states:
+        stname = stname_from_code(s)
+        if stname is not None:
+            geo_data = states[s]
+            state_to_geo[stname] = geo_data
+    return {key: state_to_geo[key] for key in sorted(state_to_geo)}
+
 def ts_geo_plot(doc):
-    
-    times = [time for time in time_series]
+    from census.key import API_KEY
+
+    try:
+        args = doc.session_context.request.arguments['args'][0].decode(encoding='UTF-8')
+    except:
+        args = []
+
+    args = eval(args)
+
+    try:
+        cdi = CensusDataInterface(args)
+        census_data = cdi.execute_query()
+    except:
+        cdi = CensusDataInterface(args, True)
+        census_data = cdi.execute_query()
+
+    geo_data = get_geo_data()
 
     geo_xs = []
     geo_ys =[]
     vals = []
-    states = [key for key in STNAME_TO_CODE]
+    states = list(census_data.keys())
 
-    for state in states:
+    list_vars= cdi.get_list_vars()
+    list_vars_labels = cdi.get_list_vars_key('label')
+    val_keys = {}
+    for var, label in zip(list_vars, list_vars_labels):
+        val_keys[label] = var
+
+    val_key = list_vars[0]
+
+
+    for fips in census_data:
+        state = FIPS_TO_STNAME[fips]
         geo_xs.append(geo_data[state]['lons'])
         geo_ys.append(geo_data[state]['lats'])
-        vals.append(time_series[0][state])
+        try:
+            vals.append(float(census_data[fips][0][val_key]['val']))
+        except:
+            vals.append(census_data[fips][0][val_key]['val'])
+
+    times = [time for time in census_data['01']]
 
     data = ColumnDataSource(dict(
         x=geo_xs,
         y=geo_ys,
-        state=states,
+        state=[FIPS_TO_STNAME[fips] for fips in states],
         val=vals
     ))
 
-    p_title = "Population by Age"
-
     p = figure(
-        title=p_title,
+        title=list_vars_labels[0],
         x_range=(-130,-60),
         y_range=(23, 52),
         plot_width=1200,
@@ -80,20 +118,52 @@ def ts_geo_plot(doc):
         ]
     )
 
-
     p.grid.grid_line_color = None
-    Viridis256.reverse()
-    color_mapper = LinearColorMapper(palette=[z for z in Viridis256 if Viridis256.index(z) % 8 == 0])
+    p.xaxis.visible = False
+    p.yaxis.visible = False
+    p.title.text_font_size = '18pt'
+
+    Viridis11.reverse()
+    color_mapper = LinearColorMapper(palette=Viridis11)
+    color_bar = ColorBar(color_mapper=color_mapper, ticker=BasicTicker())
+    p.add_layout(color_bar, 'right')
+
     p.patches(
         'x', 'y', source=data,
         fill_color={'field':'val', 'transform': color_mapper},
         fill_alpha=.7, line_color="white", line_width=0.5)
 
-    def time_slider_callback(value, old, new):
-        val_key = new
+    def dataset_select_callback(value, old, new):
+        global val_key
+        val_key = val_keys[new]
         vals = []
-        for state in states:
-            vals.append(time_series[val_key][state])
+        
+        for fips in census_data:
+            try:
+                vals.append(float(census_data[fips][0][val_key]['val']))
+            except:
+                vals.append(census_data[fips][0][val_key]['val'])
+
+        new_data = dict(
+            x=geo_xs,
+            y=geo_ys,
+            state=[FIPS_TO_STNAME[fips] for fips in states],
+            val=vals
+        )
+        data.data = new_data
+        p.title.text = new
+        time_slider.value = 0
+
+
+    def time_slider_callback(value, old, new):
+        time_index = int(new)
+        val_key = val_keys[dataset_select.value]
+        vals = []
+        for fips in census_data:
+            try:
+                vals.append(float(census_data[fips][new][val_key]['val']))
+            except:
+                vals.append(census_data[fips][new][val_key]['val'])
 
         new_data = dict(
             x=geo_xs,
@@ -102,7 +172,7 @@ def ts_geo_plot(doc):
             val=vals
         )
         data.data = new_data
-        p.title.text=f"{p_title}: {val_key}"
+            
 
     def play_button_callback():
         start = time_slider.value
@@ -110,10 +180,14 @@ def ts_geo_plot(doc):
             time_slider.value += 1
             time.sleep(.05)
 
-    time_slider = Slider(start=min(times), end=max(times), value=min(times), step=1, title='Age')
+    time_slider = Slider(start=min(times), end=max(times), value=min(times), step=1, title='Index')
     time_slider.on_change('value', time_slider_callback)
 
     play_button = Button(label='Play')
     play_button.on_click(play_button_callback)
 
-    doc.add_root(column(p, time_slider, play_button))
+
+    dataset_select = Select(title='Dataset', value=val_key, options=[key for key in val_keys])
+    dataset_select.on_change('value', dataset_select_callback)
+
+    doc.add_root(column(p, dataset_select, time_slider))

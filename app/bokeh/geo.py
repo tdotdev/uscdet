@@ -60,8 +60,13 @@ def geo_plot(doc):
 
     args = eval(args)
 
-    cdi = CensusDataInterface(args)
-    census_data = cdi.execute_query()
+    try:
+        cdi = CensusDataInterface(args)
+        census_data = cdi.execute_query()
+    except:
+        cdi = CensusDataInterface(args, True)
+        census_data = cdi.execute_query()
+
     geo_data = get_geo_data()
 
     geo_xs = []
