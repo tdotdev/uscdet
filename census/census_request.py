@@ -40,8 +40,11 @@ class CensusRequest:
         return response
             
     def request(self):
-        response = urllib.request.urlopen(self.url)
-        self.response = response.read()
+        try:
+            response = urllib.request.urlopen(self.url)
+            self.response = response.read()
+        except urllib.error.HTTPError as e:
+            print(e.response)
 
     # Private API   
     def get_ext(self):

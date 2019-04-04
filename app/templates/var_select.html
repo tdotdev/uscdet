@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for key in census_vars%}
+<p>{{census_vars[key]['label']}}</p>
+{% endfor %}
+
+{% endblock %}

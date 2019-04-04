@@ -12,6 +12,7 @@ from bokeh.palettes import Viridis11
 from bokeh.plotting import figure, curdoc
 
 from flask import request
+import time
 
 """
 api = CensusDataInterface(['pep', 'stchar6'])
@@ -176,11 +177,11 @@ def ts_geo_plot(doc):
 
     def play_button_callback():
         start = time_slider.value
-        for i in range(start, max(times)):
+        for i in range(start, 300):
             time_slider.value += 1
             time.sleep(.05)
 
-    time_slider = Slider(start=min(times), end=max(times), value=min(times), step=1, title='Index')
+    time_slider = Slider(start=min(times), end=300, value=min(times), step=1, title='Index')
     time_slider.on_change('value', time_slider_callback)
 
     play_button = Button(label='Play')
@@ -190,4 +191,4 @@ def ts_geo_plot(doc):
     dataset_select = Select(title='Dataset', value=val_key, options=[key for key in val_keys])
     dataset_select.on_change('value', dataset_select_callback)
 
-    doc.add_root(column(p, dataset_select, time_slider))
+    doc.add_root(column(p, dataset_select, time_slider, play_button))

@@ -33,8 +33,6 @@ class CensusDataInterface:
         i = 0
         for vid in vars_json['variables']:
             var = vars_json['variables'][vid]
-            if 'predicateOnly' in var:
-                continue
             self.vars[vid.lower()] = var
             i += 1
             if i == 10 and limit == True:

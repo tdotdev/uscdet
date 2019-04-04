@@ -13,6 +13,7 @@ for dset in data_json['dataset']:
     title = dset['title']
     desc = dset['description']
     variables = dset['c_variablesLink']
+    groups = dset['c_groupsLink']
     
     if d_type == 'timeseries':
         sets = sets[1::]
@@ -29,7 +30,7 @@ for dset in data_json['dataset']:
     for i, (key) in enumerate(sets):
         entry = cursor.get(key, None)
         if i == len(sets) - 1:
-            cursor[key] = {'title': title, 'desc': desc, 'vars': variables}
+            cursor[key] = {'title': title, 'desc': desc, 'vars': variables, 'groups': groups}
         else:
             if entry is None:
                 cursor[key] = {}
@@ -39,7 +40,7 @@ for dset in data_json['dataset']:
 
 def entry_to_json(entry, key):
     nodes = []
-    IGNORE = ['selectable', 'tags', 'icon', 'backColor', 'vars']
+    IGNORE = ['selectable', 'tags', 'icon', 'backColor', 'vars', 'groups']
     for new_key in entry[key]:
         if new_key in IGNORE:
             continue

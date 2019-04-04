@@ -85,13 +85,15 @@ $(document).ready(function () {
             strippedParams.unshift('timeseries');
         }
 
+        args += 'endpoint=' + endpoint + '&'
+
         for(var i = 0; i < strippedParams.length; i++) {
             args += 'p=' + strippedParams[i].toString() + '&';
         }
 
         args = args.slice(0, args.length - 1);
 
-        var url = "http://localhost:5000/" + endpoint + '?' + args;
+        var url = "http://localhost:5000/" + 'var_select' + '?' + args;
         console.log(url);
 
         window.location = url;
