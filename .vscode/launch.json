@@ -14,7 +14,7 @@
         },
         {
             "name": "USC-DET",
-            "pythonPath": "C:\\Users\\Timmy Snyder\\src\\venv\\Scripts\\python.exe",
+            "pythonPath": "C:\\Users\\snyde\\src\\venv\\Scripts\\python.exe",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/uscdet.py",

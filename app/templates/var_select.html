@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script src="{{url_for('static', filename='js/var_select.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
 
-{% for key in census_vars%}
-<p>{{census_vars[key]['label']}}</p>
-{% endfor %}
+<div id="main">
+    <h1>Select Variables</h1>
 
+    <div>
+        {% for key in census_vars%}
+        <div class="checkbox">
+            <label>
+                <input class="var" type="checkbox" value="{{key}}">{{census_vars[key]['label']}}
+            </label>
+        </div>
+        {% endfor %}
+        <button id="varSubmit" type="button" class="btn btn-primary">Submit</button>
+    </div>
+</div>
 {% endblock %}

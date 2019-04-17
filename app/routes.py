@@ -18,13 +18,15 @@ def query():
 @app.route('/geo', methods=['GET'])
 def geo():
     args = request.args.getlist('p')
-    script = server_document('http://localhost:5006/geo', arguments={'args': args})
+    vargs = request.args.getlist('v')
+    script = server_document('http://localhost:5006/geo', arguments={'args': args, 'vargs': vargs})
     return render_template('geo.html', script=script)
 
 @app.route('/ts_geo', methods=['GET'])
 def ts_geo():
     args = request.args.getlist('p')
-    script = server_document('http://localhost:5006/ts_geo', arguments={'args': args})
+    vargs = request.args.getlist('v')
+    script = server_document('http://localhost:5006/ts_geo', arguments={'args': args, 'vargs': vargs})
     return render_template('geo.html', script=script)
 
 @app.route('/var_select', methods=['GET'])
@@ -34,18 +36,19 @@ def var_select():
     cdi = CensusDataInterface(args)
     census_vars = {}
     for key in cdi.vars:
-        try:
-            data = cdi.vars[key]
-            label = data['label']
-            concept = data['concept']
-            dtype = data['predicateType']
-            census_vars[key] = {
-                'label': label,
-                'concept': concept,
-                'dtype': dtype
-            }
-        except:
-            pass
+        if key != 'for' and key != 'in':
+            try:
+                data = cdi.vars[key]
+                label = data['label']
+                concept = data['concept']
+                dtype = data['predicateType']
+                census_vars[key] = {
+                    'label': label,
+                    'concept': concept,
+                    'dtype': dtype
+                }
+            except:
+                pass
 
     return render_template('var_select.html', args=args, census_vars=census_vars, endpoint=endpoint)
 

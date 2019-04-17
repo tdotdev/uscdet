@@ -58,13 +58,20 @@ def geo_plot(doc):
     except:
         args = []
 
+    try:
+        vargs = doc.session_context.request.arguments['vargs'][0].decode(encoding='UTF-8')
+    except:
+        vargs = []
+
+
     args = eval(args)
+    vargs = eval(vargs)
 
     try:
-        cdi = CensusDataInterface(args)
+        cdi = CensusDataInterface(args, vargs)
         census_data = cdi.execute_query()
     except:
-        cdi = CensusDataInterface(args, True)
+        cdi = CensusDataInterface(args)
         census_data = cdi.execute_query()
 
     geo_data = get_geo_data()

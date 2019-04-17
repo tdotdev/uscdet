@@ -9,7 +9,7 @@ from census.dicts import FIPS_TO_STNAME
 
 
 class CensusDataInterface:
-    def __init__(self, args, limit=False):
+    def __init__(self, args, vargs=[]):
 
         self.args = args
         if args[0] == 'timeseries':
@@ -32,11 +32,17 @@ class CensusDataInterface:
         vars_json = json.loads(crm.parse_all()[self.var_link])
         i = 0
         for vid in vars_json['variables']:
-            var = vars_json['variables'][vid]
-            self.vars[vid.lower()] = var
-            i += 1
-            if i == 10 and limit == True:
-                break
+            if len(vargs) == 0:
+                if vid != 'for' and vid != 'in' and vid != 'time':
+                    var = vars_json['variables'][vid]
+                    self.vars[vid] = var
+                    i += 1
+                    if i == 10:
+                        break
+            else:
+                if vid in vargs:
+                    var = vars_json['variables'][vid]
+                    self.vars[vid] = var
     
     def print_vars(self):
         print('Vars:')
@@ -59,7 +65,7 @@ class CensusDataInterface:
         url = f"{url}?get="
 
         for key in self.vars:
-            url += f"{key.upper()},"
+            url += f"{key},"
 
         url = url[:-1]
 
@@ -75,7 +81,7 @@ class CensusDataInterface:
         parsed = crm.parse_all()
 
         parsed_json = json.loads(parsed[url])
-        header = [key.lower() for key in parsed_json[0]]
+        header = [key for key in parsed_json[0]]
         body = parsed_json[1::]
 
         header_index = {}
